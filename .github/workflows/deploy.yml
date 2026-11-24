@@ -41,7 +41,7 @@ jobs:
       - run: uv sync --locked --python 3.12
       - name: Build the website (resizes photos, reads info.txt files)
         run: uv run --locked python scripts/build.py
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
