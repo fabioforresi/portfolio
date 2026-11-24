@@ -1,5 +1,5 @@
 title: 2025 - Project name
-category: Photography
+category: Landscape
 year: 2025
 description: A short text about the project.
 You can write on several lines, they are kept as you write them.
