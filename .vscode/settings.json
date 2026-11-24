@@ -1,0 +1,10 @@
+{
+  "files.exclude": { "**/__pycache__": true, "**/.pytest_cache": true },
+  "files.insertFinalNewline": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "git.postCommitCommand": "sync",
+  "explorer.confirmDragAndDrop": false,
+  "python.testing.pytestArgs": ["tests"],
+  "python.testing.pytestEnabled": true
+}
