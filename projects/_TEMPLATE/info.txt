@@ -1,0 +1,6 @@
+title: 2025 - Project name
+category: Photography
+year: 2025
+description: A short text about the project.
+You can write on several lines, they are kept as you write them.
+video: https://vimeo.com/123456789

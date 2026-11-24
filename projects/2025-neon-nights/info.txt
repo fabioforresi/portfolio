@@ -1,0 +1,5 @@
+title: 2025 - Neon Nights
+category: Street
+year: 2025
+description: Example project with a video. Replace the link in info.txt.
+video: https://vimeo.com/76979871

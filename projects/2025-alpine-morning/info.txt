@@ -1,0 +1,4 @@
+title: 2025 - Alpine Morning
+category: Landscape
+year: 2025
+description: First light over the ridge. Example text: replace it with your own description.
