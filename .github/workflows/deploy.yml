@@ -42,7 +42,7 @@ jobs:
       - name: Build the website (resizes photos, reads info.txt files)
         run: uv run --locked python scripts/build.py
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
 
