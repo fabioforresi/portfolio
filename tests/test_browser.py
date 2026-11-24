@@ -44,8 +44,43 @@ def page(site):
 def test_overview_menu_and_images_load(page):
     assert page.locator("nav a").count() >= 7  # Overview + categories + Contact
     assert page.locator(".card").count() >= 10
-    broken = page.evaluate("[...document.images].filter(i => i.complete && i.naturalWidth === 0).length")
+    broken = page.evaluate("""async () => {
+      const images = [...document.querySelectorAll(".card img")];
+      await Promise.all(images.map(img => {
+        img.loading = "eager";
+        if (img.complete) return;
+        return new Promise(resolve => {
+          img.addEventListener("load", resolve, { once: true });
+          img.addEventListener("error", resolve, { once: true });
+        });
+      }));
+      return images.filter(img => img.naturalWidth === 0).length;
+    }""")
     assert broken == 0
+
+
+def test_ludwig_desktop_layout(page, site):
+    page.goto(site)
+    layout = page.evaluate("""() => {
+      const grid = document.querySelector(".grid");
+      const card = document.querySelector(".card");
+      const header = document.querySelector(".site-header");
+      const nav = document.querySelector("nav");
+      const logo = document.querySelector(".logo");
+      return {
+        columns: getComputedStyle(grid).gridTemplateColumns.split(" ").length,
+        aspectRatio: card.getBoundingClientRect().width / card.getBoundingClientRect().height,
+        sideMargin: grid.getBoundingClientRect().left,
+        headerPosition: getComputedStyle(header).position,
+        navRight: nav.getBoundingClientRect().right,
+        logoLeft: logo.getBoundingClientRect().left
+      };
+    }""")
+    assert layout["columns"] == 2
+    assert abs(layout["aspectRatio"] - 16 / 9) < 0.02
+    assert layout["sideMargin"] > 0
+    assert layout["headerPosition"] == "sticky"
+    assert layout["navRight"] < layout["logoLeft"]
 
 
 def test_category_filter(page, site):
@@ -73,16 +108,35 @@ def test_contact_and_no_js_errors(page, site):
 
 
 def test_mobile_menu_opens_and_closes(page, site):
-    if True:
-        br = page.context.browser
-        pg = br.new_page(viewport={"width": 390, "height": 800})
+    browser = page.context.browser
+    pg = browser.new_page(viewport={"width": 390, "height": 800})
+    try:
         pg.goto(site)
         pg.wait_for_selector(".card")
-        assert pg.locator("#burger").is_visible() and not pg.locator("nav a").first.is_visible()
+        layout = pg.evaluate("""() => ({
+          columns: getComputedStyle(document.querySelector(".grid")).gridTemplateColumns.split(" ").length,
+          scrollWidth: document.documentElement.scrollWidth,
+          viewportWidth: innerWidth
+        })""")
+        assert layout["columns"] == 1
+        assert layout["scrollWidth"] == layout["viewportWidth"]
+        assert pg.locator("#burger").is_visible()
+        assert not pg.locator("nav a").first.is_visible()
+
+        pg.click("#burger")
+        pg.wait_for_selector("nav a", state="visible")
+        assert pg.locator("#burger").get_attribute("aria-expanded") == "true"
+        assert pg.evaluate("document.body.classList.contains('menu-open')")
+        pg.keyboard.press("Escape")
+        pg.locator("nav a").first.wait_for(state="hidden")
+        assert pg.locator("#burger").get_attribute("aria-expanded") == "false"
+        assert not pg.evaluate("document.body.classList.contains('menu-open')")
+
         pg.click("#burger")
         pg.wait_for_selector("nav a", state="visible")
         pg.click("nav a:has-text('Street')")
         pg.wait_for_selector(".card")
-        pg.locator("nav a").first.wait_for(state="hidden")  # menu closes after choosing
-        assert pg.evaluate("document.documentElement.scrollWidth <= innerWidth")  # no sideways scroll
+        pg.locator("nav a").first.wait_for(state="hidden")
+        assert pg.evaluate("document.documentElement.scrollWidth <= innerWidth")
+    finally:
         pg.close()

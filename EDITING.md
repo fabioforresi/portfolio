@@ -40,8 +40,8 @@ If something is wrong, the terminal tells you in plain words what to fix.
 4. After 1–3 minutes the website is updated. To follow it, open the **Actions** tab of the repository on GitHub: green ✔ = published, red ✖ = see "If the red cross appears" below.
 
 ### First time only
-- Install **Python 3.10+** (python.org) and **Git** (git-scm.com), and sign in to GitHub from VS Code when asked (Accounts icon, bottom left).
-- Run **Terminal → Run Task… → ⚙ Install (first time only)**.
+- Install [**uv**](https://docs.astral.sh/uv/getting-started/installation/) and **Git** (git-scm.com), and sign in to GitHub from VS Code when asked (Accounts icon, bottom left).
+- Run **Terminal → Run Task… → ⚙ Install (first time only)**. This creates the project environment, installs dependencies and prepares the browser tests.
 - Get the repository: **Ctrl+Shift+P → "Git: Clone"**, paste the repository address, choose a folder on your computer.
 
 > Large originals: GitHub refuses single files over 100 MB and the repository gets heavy quickly. Export photos as JPG at about 2500 px on the long side (1–5 MB each) before adding them.

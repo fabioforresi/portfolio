@@ -21,11 +21,11 @@ and the live site stays untouched.
 
 ## Local development
 ```bash
-pip install -r requirements-dev.txt
-python -m playwright install chromium
-python scripts/build.py --serve     # preview on http://localhost:8000 (rebuilds on save)
+uv sync
+uv run python -m playwright install chromium
+uv run python scripts/build.py --serve  # preview on http://localhost:8000 (rebuilds on save)
 # in VS Code: Ctrl+Shift+B
-python -m pytest                    # tests
+uv run pytest -q                    # tests
 ```
 
 ## Design changes
@@ -33,4 +33,4 @@ The look is inspired by Adobe Portfolio's Ludwig theme: centered logo, horizonta
 Source images are never modified; optimized copies are generated into `dist/` (ignored by git).
 
 ## Setup
-Settings → Pages → Source: **GitHub Actions**.
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) once, then run `uv sync` in the project folder. Settings → Pages → Source: **GitHub Actions**.

@@ -1,0 +1,20 @@
+[project]
+name = "fabioforresi-portfolio"
+version = "0.1.0"
+description = "Static photography portfolio builder and tests"
+requires-python = ">=3.10"
+dependencies = [
+    "Pillow>=10",
+]
+
+[dependency-groups]
+dev = [
+    "playwright>=1.45",
+    "pytest>=8",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.uv]
+package = false

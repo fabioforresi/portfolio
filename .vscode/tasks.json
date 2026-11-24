@@ -5,9 +5,8 @@
       "label": "▶ Preview website",
       "detail": "Builds the site and opens a live preview at http://localhost:8000",
       "type": "shell",
-      "command": "python3",
-      "args": ["scripts/build.py", "--serve"],
-      "windows": { "command": "python" },
+      "command": "uv",
+      "args": ["run", "python", "scripts/build.py", "--serve"],
       "isBackground": true,
       "problemMatcher": [],
       "presentation": { "reveal": "always", "panel": "dedicated" },
@@ -17,24 +16,24 @@
       "label": "✔ Check projects",
       "detail": "Looks for mistakes in your project folders, in plain words",
       "type": "shell",
-      "command": "python3",
-      "args": ["scripts/build.py"],
-      "windows": { "command": "python" },
+      "command": "uv",
+      "args": ["run", "python", "scripts/build.py"],
       "problemMatcher": [],
       "presentation": { "reveal": "always", "panel": "shared" }
     },
     {
       "label": "⚙ Install (first time only)",
+      "detail": "Installs locked dependencies and Chromium for browser tests",
       "type": "shell",
-      "command": "python3 -m pip install -r requirements.txt",
-      "windows": { "command": "python -m pip install -r requirements.txt" },
+      "command": "uv",
+      "args": ["run", "--locked", "python", "-m", "playwright", "install", "chromium"],
       "problemMatcher": []
     },
     {
       "label": "🧪 Run tests (advanced)",
       "type": "shell",
-      "command": "python3 -m pytest -q",
-      "windows": { "command": "python -m pytest -q" },
+      "command": "uv",
+      "args": ["run", "--locked", "pytest", "-q"],
       "problemMatcher": [],
       "group": "test"
     }
