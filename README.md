@@ -29,8 +29,7 @@ python -m pytest                    # tests
 ```
 
 ## Design changes
-The look is a dark theme matched to the original Adobe Portfolio site (condensed caps menu, 16:9 covers with hover title + year, full-screen mobile menu, "You may also like").
-Colours, fonts, number of columns, gaps and cover shape: variables in the `THEME SETTINGS` block at the top of `web/css/style.css`. Fonts (Bebas Neue, Montserrat, SIL OFL) are self-hosted in `web/fonts`. Layout and routing: `web/js/main.js`.
+The look is inspired by Adobe Portfolio's Ludwig theme: centered logo, horizontal desktop navigation, dark background, two-column 16:9 cover grid with hover titles, and a full-screen mobile menu. Colours, fonts, columns, spacing and cover shape are set at the top of `web/css/style.css`. Bebas Neue is self-hosted in `web/fonts`; layout and routing are in `web/js/main.js`.
 Source images are never modified; optimized copies are generated into `dist/` (ignored by git).
 
 ## Setup
