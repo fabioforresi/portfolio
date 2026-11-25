@@ -71,11 +71,23 @@ def test_single_image_is_both_cover_and_gallery(root):
     assert ps[0]["images"] == ["images/2025-x/only.jpg"] and ps[0]["cover"].endswith("thumb.jpg")
 
 
-def test_large_photos_are_shrunk_and_names_cleaned(root):
-    project(root, "2025-big", "title: B\ncategory: Video\n", images=("My Photo (1).JPG",))
+def test_svg_placeholders_are_copied_and_published(root):
+    d = root / "projects" / "2026-short-cut"
+    d.mkdir(parents=True)
+    (d / "info.txt").write_text("title: Textured Crop\ncategory: Retouching\n")
+    svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 9"><text>Placeholder</text></svg>'
+    (d / "cover.svg").write_text(svg, encoding="utf-8")
+    _, ps = B.build(root)
+    assert ps[0]["cover"] == "images/2026-short-cut/thumb.svg"
+    assert ps[0]["images"] == ["images/2026-short-cut/cover.svg"]
+    assert (root / "dist" / ps[0]["cover"]).read_text(encoding="utf-8") == svg
+
+
+def test_large_images_are_shrunk_and_names_cleaned(root):
+    project(root, "2025-big", "title: B\ncategory: Video\n", images=("My Image (1).JPG",))
     _, ps = B.build(root)
     out = root / "dist" / ps[0]["images"][0]
-    assert out.name == "my-photo-1.jpg"
+    assert out.name == "my-image-1.jpg"
     img(root / "projects" / "2025-big" / "huge.jpg", (6000, 4000))
     _, ps = B.build(root)
     huge = root / "dist" / "images" / "2025-big" / "huge.jpg"
@@ -101,16 +113,16 @@ def test_friendly_errors(root, info, fragment):
     assert any(fragment in p for p in e.value.problems)
 
 
-def test_errors_for_no_photos_and_heic(root):
+def test_errors_for_no_images_and_unsupported_format(root):
     project(root, "2025-empty", "title: A\ncategory: Video\n", images=())
     d = root / "projects" / "2025-heic"
     d.mkdir()
     (d / "info.txt").write_text("title: H\ncategory: Video\n")
-    (d / "IMG_1.HEIC").write_bytes(b"x")
+    (d / "unsupported.gif").write_bytes(b"x")
     with pytest.raises(B.BuildError) as e:
         B.build(root)
     text = "\n".join(e.value.problems)
-    assert "no photos" in text and "export it as JPG" in text
+    assert "no images" in text and "JPG, PNG, WebP or SVG" in text
 
 
 def test_corrupt_image_reports_instead_of_crashing(root):
@@ -123,8 +135,11 @@ def test_corrupt_image_reports_instead_of_crashing(root):
 
 def test_real_repository_builds(tmp_path):
     _, ps = B.build(REPO, tmp_path / "out")
-    assert ps and all((tmp_path / "out" / p["cover"]).exists() for p in ps)
+    assert len(ps) == 4
+    assert {p["category"] for p in ps} == {"SHORT", "MID", "LONG", "AFRO"}
     data = json.loads((tmp_path / "out" / "data" / "projects.json").read_text())
+    assert data["site"]["categories"] == ["SHORT", "MID", "LONG", "AFRO"]
+    assert data["site"]["contact"]["email"] == "fabio.forresi@gmail.com"
     for p in data["projects"]:
         for m in p["images"]:
             if isinstance(m, str):

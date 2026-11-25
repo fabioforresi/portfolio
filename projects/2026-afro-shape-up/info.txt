@@ -1,0 +1,4 @@
+title: Defined Afro Shape-Up
+category: AFRO
+year: 2026
+description: Defined natural texture with a clean, precise outline.

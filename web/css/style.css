@@ -33,6 +33,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 /* ---- menu ---- */
 nav{grid-column:1;grid-row:1;display:flex;align-items:center;gap:clamp(14px,1.8vw,26px)}
 nav a{font-family:var(--font-display);font-size:clamp(14px,1.3vw,19px);color:var(--muted);transition:color .2s}
+nav a.featured{font-size:clamp(20px,1.8vw,26px)}
 nav a:hover,nav a.active{color:var(--fg)}
 .burger,.close{display:none}
 @media (max-width:900px){
@@ -42,6 +43,7 @@ nav a:hover,nav a.active{color:var(--fg)}
   .burger span:nth-child(1){top:2px}.burger span:nth-child(2){top:10px}.burger span:nth-child(3){top:18px}
   nav{position:fixed;inset:0;z-index:50;background:var(--bg);flex-direction:column;align-items:center;justify-content:flex-start;gap:0;padding-top:96px;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
   nav a{font-size:23px;padding:19px 0}
+  nav a.featured{font-size:30px}
   body.menu-open nav{opacity:1;visibility:visible}
   .close{position:fixed;z-index:60;top:32px;right:24px;width:24px;height:24px;opacity:0;visibility:hidden;transition:opacity .25s}
   body.menu-open .close{display:block;opacity:1;visibility:visible}
@@ -59,6 +61,10 @@ nav a:hover,nav a.active{color:var(--fg)}
 .card h3{margin:0;font-family:var(--font-display);font-weight:400;font-size:clamp(18px,1.7vw,24px);letter-spacing:.02em;text-transform:uppercase}
 .card .yr{margin-top:10px;font-family:var(--font-display);font-size:16px;color:var(--muted)}
 .empty{text-align:center;color:var(--muted);padding:80px 20px}
+.placeholder-card{display:flex;align-items:center;justify-content:center;background:#1a1a1a;border:1px solid #292929}
+.placeholder-content{text-align:center;color:var(--muted)}
+.placeholder-label{font-size:11px;letter-spacing:.18em;text-transform:uppercase}
+.placeholder-content h2{margin:8px 0 0;color:var(--fg);font-family:var(--font-display);font-size:clamp(26px,3vw,42px);font-weight:400;letter-spacing:.04em;text-transform:uppercase}
 
 /* ---- project page ---- */
 .project{padding-top:22px}
@@ -72,10 +78,15 @@ nav a:hover,nav a.active{color:var(--fg)}
 .related h2{margin:0 0 22px;padding:0 var(--pad);font-family:var(--font-display);font-weight:400;font-size:clamp(22px,2vw,30px);letter-spacing:.02em;text-transform:uppercase}
 
 /* ---- contact ---- */
-.contact{max-width:760px;margin:20px auto 0;padding:0 var(--pad);text-align:center;font-size:clamp(16px,1.3vw,19px);color:var(--muted)}
-.contact p{margin:0 0 22px}
-.contact a{color:var(--fg);border-bottom:1px solid #555}
-.contact a:hover{border-color:#fff}
+.contact{max-width:660px;margin:20px auto 0;padding:0 var(--pad);color:var(--muted)}
+.page-title{margin:0 0 34px;text-align:center;color:var(--fg);font-family:var(--font-display);font-size:clamp(30px,3vw,42px);font-weight:400;letter-spacing:.03em;text-transform:uppercase}
+.contact-form{display:flex;flex-direction:column;gap:10px}
+.contact-form label{margin-top:12px;color:var(--fg);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.contact-form input,.contact-form textarea{width:100%;padding:12px 0;border:0;border-bottom:1px solid #555;border-radius:0;outline:none;background:transparent;color:var(--fg);font:inherit;resize:vertical}
+.contact-form input:focus,.contact-form textarea:focus{border-color:var(--fg)}
+.contact-submit{align-self:center;margin-top:24px;padding:12px 26px;border:1px solid #777;color:var(--fg);font-family:var(--font-display);font-size:20px;letter-spacing:.06em;text-transform:uppercase;transition:background .2s,color .2s}
+.contact-submit:hover{background:var(--fg);color:var(--bg)}
+.form-note{margin:16px 0 0;text-align:center;color:var(--muted);font-size:13px}
 
 /* ---- footer ---- */
 .site-footer{display:flex;flex-direction:column;align-items:center;gap:14px;padding:72px 20px 84px;color:var(--muted);font-size:13px}

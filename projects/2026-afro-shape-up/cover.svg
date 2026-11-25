@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#29251a"/><stop offset="1" stop-color="#111"/></linearGradient>
+    <pattern id="dots" width="30" height="30" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="2" fill="#c0a66c" fill-opacity=".26"/></pattern>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h1600v900H0z"/><path fill="url(#dots)" d="M0 0h1600v900H0z"/>
+  <circle cx="1300" cy="230" r="205" fill="none" stroke="#c0a66c" stroke-opacity=".25" stroke-width="2"/>
+  <path d="M1110 300q190-230 380 0M1150 330q150-180 300 0M1190 360q110-130 220 0" fill="none" stroke="#d3c28d" stroke-opacity=".55" stroke-width="5"/>
+  <text x="110" y="630" fill="#c0a66c" font-family="Arial,sans-serif" font-size="24" letter-spacing="8">AFRO • BARBER PORTFOLIO</text>
+  <text x="105" y="735" fill="#fff" font-family="Arial,sans-serif" font-size="62" font-weight="700" letter-spacing="2">DEFINED AFRO SHAPE-UP</text>
+  <text x="110" y="805" fill="#aaa" font-family="Arial,sans-serif" font-size="20" letter-spacing="5">IMAGE PLACEHOLDER</text>
+</svg>

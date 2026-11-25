@@ -1,6 +1,5 @@
-title: 2025 - Project name
-category: Landscape
-year: 2025
-description: A short text about the project.
+title: Textured Crop with Low Fade
+category: SHORT
+year: 2026
+description: A short example description for the haircut.
 You can write on several lines, they are kept as you write them.
-video: https://vimeo.com/123456789

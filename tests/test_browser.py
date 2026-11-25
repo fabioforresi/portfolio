@@ -1,4 +1,5 @@
 """Opens the built site in a real browser and clicks through it."""
+import json
 import functools
 import http.server
 import threading
@@ -41,9 +42,28 @@ def page(site):
         b.close()
 
 
-def test_overview_menu_and_images_load(page):
-    assert page.locator("nav a").count() >= 7  # Overview + categories + Contact
-    assert page.locator(".card").count() >= 10
+def test_gallery_menu_and_sample_projects(page):
+    assert [label.lower() for label in page.locator("nav a").all_inner_texts()] == [
+        "gallery", "short", "mid", "long", "afro", "contact"
+    ]
+    assert page.locator(".card").count() == 4
+    assert page.locator(".card img[src$='.svg']").count() == 4
+    sizes = page.locator("nav a").evaluate_all(
+        "(links) => links.map(link => parseFloat(getComputedStyle(link).fontSize))"
+    )
+    assert sizes[0] > sizes[1] and sizes[-1] > sizes[1]
+
+
+def test_contact_form_uses_mailto(page):
+    page.goto(page.url.split("#")[0] + "#/contact")
+    page.wait_for_selector(".contact-form")
+    assert page.locator("#contact-name").is_visible()
+    assert page.locator("#contact-email").get_attribute("type") == "email"
+    assert page.locator("#contact-message").is_visible()
+    assert page.locator("#contact-form").get_attribute("data-recipient") == "fabio.forresi@gmail.com"
+
+
+def test_overview_images_load(page):
     broken = page.evaluate("""async () => {
       const images = [...document.querySelectorAll(".card img")];
       await Promise.all(images.map(img => {
@@ -84,25 +104,33 @@ def test_ludwig_desktop_layout(page, site):
 
 
 def test_category_filter(page, site):
-    page.goto(site + "#/category/landscape")
+    page.goto(site + "#/category/short")
     page.wait_for_selector(".card")
-    titles = page.locator(".card h3").all_inner_texts()  # hidden until hover, still in the page
-    assert titles and len(titles) == 3
+    assert page.locator(".card").count() == 1
+    assert page.locator(".card h3").inner_text().lower() == "textured crop with low fade"
 
 
-def test_project_page_and_video(page, site):
-    page.goto(site + "#/project/2025-neon-nights")
+def test_project_page_with_future_gallery_data(page, site):
+    image = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+    projects = [
+        {"slug": "short-cut", "title": "Short cut", "category": "SHORT", "year": "", "description": "", "cover": image, "images": [image]},
+        {"slug": "mid-cut", "title": "Mid cut", "category": "MID", "year": "", "description": "", "cover": image, "images": [image]},
+    ]
+    page.route("**/data/projects.json", lambda route: route.fulfill(
+        content_type="application/json",
+        body=json.dumps({"site": {"name": "Fabio Forresi", "categories": ["SHORT", "MID", "LONG", "AFRO"]}, "projects": projects}),
+    ))
+    page.goto(site + "?fixture=projects#/project/short-cut")
     page.wait_for_selector(".project h1")
-    assert "neon nights" in page.locator(".project h1").inner_text().lower()
-    assert page.locator(".video iframe").count() == 1
-    assert page.locator(".project img").count() >= 1
-    assert page.locator(".related .card").count() >= 1  # "You may also like"
+    assert page.locator(".project h1").inner_text().lower() == "short cut"
+    assert page.locator(".media img").count() == 1
+    assert page.locator(".related .card").count() == 1
 
 
 def test_contact_and_no_js_errors(page, site):
     page.goto(site + "#/contact")
-    page.wait_for_selector(".contact")
-    assert page.locator(".contact a[href^='mailto:']").count() == 1
+    page.wait_for_selector(".contact-form")
+    assert page.locator(".contact-form [required]").count() == 3
     external = [e for e in page.errors if "vimeo" not in e.lower() and "ERR_" not in e]
     assert external == []
 
@@ -134,7 +162,7 @@ def test_mobile_menu_opens_and_closes(page, site):
 
         pg.click("#burger")
         pg.wait_for_selector("nav a", state="visible")
-        pg.click("nav a:has-text('Street')")
+        pg.click("nav a:has-text('afro')")
         pg.wait_for_selector(".card")
         pg.locator("nav a").first.wait_for(state="hidden")
         assert pg.evaluate("document.documentElement.scrollWidth <= innerWidth")

@@ -18,7 +18,7 @@ from urllib.parse import parse_qs, urlparse
 
 from PIL import Image, ImageOps
 
-IMAGE_EXT = {".jpg", ".jpeg", ".png", ".webp"}
+IMAGE_EXT = {".jpg", ".jpeg", ".png", ".webp", ".svg"}
 KNOWN_BUT_UNSUPPORTED = {".heic", ".heif", ".tif", ".tiff", ".gif", ".bmp", ".psd", ".raw", ".cr2", ".nef", ".arw"}
 PROJECT_KEYS = {"title", "category", "year", "description", "video", "draft"}
 SITE_KEYS = {"name", "tagline", "footer", "logo", "categories", "contact_text", "email", "link"}
@@ -93,7 +93,7 @@ def load_site(root, problems):
     d = parse_kv(f.read_text(encoding="utf-8"), SITE_KEYS)
     cats = [c.strip() for c in first(d, "categories").split(",") if c.strip()]
     if not cats:
-        problems.append("site.txt: the line 'categories:' is empty. Example:  categories: Landscape, Street, Travel")
+        problems.append("site.txt: the line 'categories:' is empty. Example:  categories: SHORT, MID, LONG, AFRO")
     links = []
     for line in d.get("link", []):
         label, _, url = line.partition("|")
@@ -152,7 +152,7 @@ def collect_projects(root, out, problems, do_optimize=True):
         files = sorted((f for f in folder.iterdir() if f.is_file()), key=lambda f: natural_key(f.name))
         for f in files:
             if f.suffix.lower() in KNOWN_BUT_UNSUPPORTED:
-                problems.append(f"{where}/{f.name}: this format is not supported on the web. Please export it as JPG or PNG.")
+                problems.append(f"{where}/{f.name}: this format is not supported on the web. Please use JPG, PNG, WebP or SVG.")
         imgs = [f for f in files if f.suffix.lower() in IMAGE_EXT]
         cover_src = next((f for f in imgs if f.stem.lower() == "cover"), None)
         gallery_src = [f for f in imgs if f is not cover_src] or ([cover_src] if cover_src else [])
@@ -166,7 +166,7 @@ def collect_projects(root, out, problems, do_optimize=True):
             else:
                 problems.append(f"{where}/info.txt: the video link '{v}' is not a YouTube or Vimeo link.")
         if not imgs:
-            problems.append(f"{where}: there are no photos in this folder (jpg, png or webp).")
+            problems.append(f"{where}: there are no images in this folder (jpg, png, webp or svg).")
             continue
 
         slug = slug_name(folder.name)
@@ -177,22 +177,25 @@ def collect_projects(root, out, problems, do_optimize=True):
             while n in used:
                 n += "-x"
             used.add(n)
-            return base / (n + (".png" if f.suffix.lower() == ".png" else ".jpg" if f.suffix.lower() in (".jpg", ".jpeg") else ".webp"))
+            ext = f.suffix.lower()
+            return base / (n + (".jpg" if ext == ".jpeg" else ext))
         try:
             for f in gallery_src:
                 dst = target(f)
-                if do_optimize:
+                if do_optimize and f.suffix.lower() != ".svg":
                     optimize(f, dst, MAX_SIDE)
                 else:
                     dst.parent.mkdir(parents=True, exist_ok=True); shutil.copy2(f, dst)
                 images.append(f"images/{slug}/{dst.name}")
             thumb_src = cover_src or gallery_src[0]
-            tdst = base / ("thumb" + (".png" if thumb_src.suffix.lower() == ".png" else ".jpg"))
-            if tdst.suffix == ".jpg" and thumb_src.suffix.lower() == ".webp":
-                tdst = base / "thumb.webp"
-            optimize(thumb_src, tdst, THUMB_SIDE) if do_optimize else (tdst.parent.mkdir(parents=True, exist_ok=True), shutil.copy2(thumb_src, tdst))
+            thumb_ext = ".jpg" if thumb_src.suffix.lower() in (".jpg", ".jpeg") else thumb_src.suffix.lower()
+            tdst = base / ("thumb" + thumb_ext)
+            if do_optimize and thumb_src.suffix.lower() != ".svg":
+                optimize(thumb_src, tdst, THUMB_SIDE)
+            else:
+                tdst.parent.mkdir(parents=True, exist_ok=True); shutil.copy2(thumb_src, tdst)
         except Exception as e:  # corrupted image etc.
-            problems.append(f"{where}: could not read one of the photos ({e}). Try exporting it again as JPG.")
+            problems.append(f"{where}: could not read one of the images ({e}). Check the file format and try again.")
             continue
 
         year = first(info, "year") or (re.match(r"^(\d{4})", folder.name).group(1) if re.match(r"^\d{4}", folder.name) else "")

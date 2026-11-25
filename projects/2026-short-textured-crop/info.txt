@@ -1,0 +1,4 @@
+title: Textured Crop with Low Fade
+category: SHORT
+year: 2026
+description: A short, textured crop with a clean low fade.

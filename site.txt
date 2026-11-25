@@ -2,7 +2,7 @@
 # Format:  setting: value      (lines starting with # are ignored)
 
 name: Fabio Forresi
-tagline: Photographer & Visual Artist
+tagline: Barbiere
 footer: © Fabio Forresi
 
 # Optional: use an image as logo instead of the text above.
@@ -10,9 +10,7 @@ footer: © Fabio Forresi
 # logo: logo.png
 
 # The menu sections. Every project's "category" must be one of these.
-categories: Landscape, Architecture, Street, Abstract, Travel
+categories: SHORT, MID, LONG, AFRO
 
 # Contact page
-contact_text: Available for commissions and collaborations.
-email: your@email.com
-link: Instagram | https://instagram.com/yourhandle
+email: fabio.forresi@gmail.com

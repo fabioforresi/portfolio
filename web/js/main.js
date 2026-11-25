@@ -30,20 +30,32 @@ async function init() {
 }
 
 function renderNav(active) {
-  const items = [{ label: 'Overview', href: '#/', key: '' }]
+  const items = [{ label: 'Gallery', href: '#/', key: '', featured: true }]
     .concat((DATA.site.categories || []).map(c => ({ label: c, href: '#/category/' + slugify(c), key: slugify(c) })))
-    .concat([{ label: 'Contact', href: '#/contact', key: 'contact' }]);
+    .concat([{ label: 'Contact', href: '#/contact', key: 'contact', featured: true }]);
   document.getElementById('nav').innerHTML = items
-    .map(i => `<a href="${i.href}" class="${i.key === active ? 'active' : ''}">${esc(i.label)}</a>`).join('');
+    .map(i => `<a href="${i.href}" class="${[i.key === active ? 'active' : '', i.featured ? 'featured' : ''].filter(Boolean).join(' ')}">${esc(i.label)}</a>`).join('');
 }
 
-function grid(list) {
-  if (!list.length) return '<p class="empty">Nothing here yet.</p>';
+function placeholder(category) {
+  return `<div class="card placeholder-card" role="img" aria-label="${esc(category)} — images coming soon">
+    <div class="placeholder-content"><span class="placeholder-label">Coming soon</span><h2>${esc(category)}</h2></div>
+  </div>`;
+}
+
+function grid(list, emptyCategories = []) {
+  if (!list.length && !emptyCategories.length) return '<p class="empty">Nothing here yet.</p>';
   return '<div class="grid">' + list.map(p => `
     <a class="card" href="#/project/${esc(p.slug)}">
       <img loading="lazy" src="${esc(p.cover || '')}" alt="${esc(p.title)}">
       <div class="over"><h3>${esc(p.title)}</h3>${p.year ? `<span class="yr">${esc(p.year)}</span>` : ''}</div>
-    </a>`).join('') + '</div>';
+    </a>`).join('') + emptyCategories.map(placeholder).join('') + '</div>';
+}
+
+function gallery() {
+  const categoriesWithProjects = new Set(DATA.projects.map(p => slugify(p.category || '')));
+  const emptyCategories = (DATA.site.categories || []).filter(c => !categoriesWithProjects.has(slugify(c)));
+  return grid(DATA.projects, emptyCategories);
 }
 
 function related(p) {
@@ -70,10 +82,20 @@ function project(slug) {
 }
 
 function contact() {
-  const c = DATA.site.contact || {};
-  return `<section class="contact"><p>${esc(c.text || '')}</p>
-    ${c.email ? `<p><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></p>` : ''}
-    ${(c.links || []).map(l => `<p><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a></p>`).join('')}</section>`;
+  const email = DATA.site.contact?.email || '';
+  return `<section class="contact">
+    <h1 class="page-title">Contact</h1>
+    <form class="contact-form" id="contact-form" data-recipient="${esc(email)}">
+      <label for="contact-name">Name</label>
+      <input id="contact-name" name="name" autocomplete="name" required>
+      <label for="contact-email">Email</label>
+      <input id="contact-email" name="email" type="email" autocomplete="email" required>
+      <label for="contact-message">Message</label>
+      <textarea id="contact-message" name="message" rows="5" required></textarea>
+      <button class="contact-submit" type="submit">Send message</button>
+      <p class="form-note">Your email app will open with the message ready to send.</p>
+    </form>
+  </section>`;
 }
 
 function route() {
@@ -82,15 +104,27 @@ function route() {
   scrollTo(0, 0);
   if (kind === 'category') {
     renderNav(arg);
-    app.innerHTML = grid(DATA.projects.filter(p => slugify(p.category || '') === arg));
+    const category = (DATA.site.categories || []).find(c => slugify(c) === arg);
+    const projects = DATA.projects.filter(p => slugify(p.category || '') === arg);
+    app.innerHTML = grid(projects, category && !projects.length ? [category] : []);
   } else if (kind === 'project') {
     const p = DATA.projects.find(x => x.slug === arg);
     renderNav(p ? slugify(p.category || '') : '');
     app.innerHTML = project(arg);
   } else if (kind === 'contact') {
-    renderNav('contact'); app.innerHTML = contact();
+    renderNav('contact');
+    app.innerHTML = contact();
+    document.getElementById('contact-form').addEventListener('submit', event => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const fields = new FormData(form);
+      const subject = `Website contact from ${fields.get('name')}`;
+      const body = `Name: ${fields.get('name')}\nEmail: ${fields.get('email')}\n\n${fields.get('message')}`;
+      const recipient = form.dataset.recipient || '';
+      window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    });
   } else {
-    renderNav(''); app.innerHTML = grid(DATA.projects);
+    renderNav(''); app.innerHTML = gallery();
   }
 }
 init();
