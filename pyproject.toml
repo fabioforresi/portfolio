@@ -4,13 +4,14 @@ version = "0.1.0"
 description = "Static photography portfolio builder and tests"
 requires-python = ">=3.10"
 dependencies = [
-    "Pillow>=10",
+    "Pillow>=12.3,<13; python_version < '3.11'",
+    "Pillow>=13,<14; python_version >= '3.11'",
 ]
 
 [dependency-groups]
 dev = [
-    "playwright>=1.45",
-    "pytest>=8",
+    "playwright>=1.65,<2",
+    "pytest>=9,<10",
 ]
 
 [tool.pytest.ini_options]
